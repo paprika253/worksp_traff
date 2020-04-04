@@ -1,0 +1,134 @@
+package server;
+
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Vector;
+
+import utilites.DbMySql;
+import utilites.Set;
+
+public class LoadMeneger
+{
+	private DbMySql	db;
+	private String	php_path;
+
+	public LoadMeneger() throws IOException, InterruptedException, SQLException
+	{
+		db = new DbMySql("traff", "localhost", "yaa", "a20071952");
+		Set set = new Set(db.conn);
+		Log log = new Log(db.conn);
+		log.put(1, "Download API Information from Maxbounty - started");
+		php_path = set.get("php_path");
+		RunTime rt = new RunTime("php " + php_path + "load_cl.php");
+		// if (rt.chek() > 0)
+		System.out.println(rt.err());
+		// else
+		System.out.println(rt.out());
+		log.put(1, "Download Compaign Creatives - started");
+		// очистка таблиц
+		PreparedStatement ps = db.conn.prepareStatement("TRUNCATE TABLE compaign_creatives");
+		ps.execute();
+		ps = db.conn.prepareStatement("TRUNCATE TABLE err_offerid");
+		ps.execute();
+		//
+		System.out.println("OFFER_ID:");
+		Vector<String> voferid = new Vector<String>();
+		int i = 0;
+		ps = db.conn.prepareStatement("SELECT OFFER_ID FROM campaign_list");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next())
+		{
+			voferid.add(rs.getInt("OFFER_ID") + "");
+			if (i > 19)
+			{
+				start_php_cc(voferid);
+				voferid.clear();
+				i = 0;
+			}
+			i++;
+		}
+		start_php_cc(voferid);
+		log.put(1, "End of creative upload.");
+		ps = db.conn.prepareStatement("SELECT OFFER_ID FROM err_offerid");
+		rs = ps.executeQuery();
+		i = 0;
+		PreparedStatement ps1 = db.conn.prepareStatement("DELETE FROM campaign_list WHERE OFFER_ID = ?");
+		while (rs.next())
+		{
+			ps1.setInt(1, rs.getInt("OFFER_ID"));
+			ps1.execute();
+			i++;
+		}
+		log.put(1, i + " ad campaigns removed due to lack of creatives.");
+		// перекачка изображений
+		log.put(1, "Image upload and URL replacement started.");
+		ps1 = db.conn.prepareStatement("DELETE FROM compaign_creatives WHERE OFFER_ID = ? AND CREATIVE_ID = ?");
+		PreparedStatement ps2 = db.conn
+				.prepareStatement("UPDATE compaign_creatives SET CODE = ? WHERE OFFER_ID = ? AND CREATIVE_ID = ?");
+		String img_path = set.get("img_path");
+		String url_img = set.get("url_img");
+		ps = db.conn.prepareStatement("SELECT OFFER_ID, CREATIVE_ID, CODE, CREATIVE_TYPE FROM compaign_creatives");
+		rs = ps.executeQuery();
+		i = 0;
+		int j = 0;
+		while (rs.next())
+		{
+			String CREATIVE_TYPE = rs.getString("CREATIVE_TYPE");
+			if (!CREATIVE_TYPE.equals("Banner"))
+				continue;
+			int OFFER_ID = rs.getInt("OFFER_ID");
+			int CREATIVE_ID = rs.getInt("CREATIVE_ID");
+			String new_html_link = SaveImg.save(OFFER_ID, CREATIVE_ID, rs.getString("CODE"), img_path, url_img);
+			if (new_html_link.equals("continue"))
+				continue;
+			else if (new_html_link == null)
+			{
+				ps1.setInt(1, OFFER_ID);
+				ps1.setInt(2, CREATIVE_ID);
+				ps1.execute();
+				i++;
+				continue;
+			}
+			ps2.setString(1, new_html_link);
+			ps2.setInt(2, OFFER_ID);
+			ps2.setInt(3, CREATIVE_ID);
+			ps2.execute();
+			j++;
+			// if (j > 100)
+			// break;
+		}
+		log.put(1, "Image upload has ended.");
+		if (i > 0)
+			log.put(1, i + " creatives deleted.");
+		log.put(1, "Download API Information from Maxbounty - ended.");
+	}
+
+	private void start_php_cc(Vector<String> voferid) throws IOException, InterruptedException
+	{
+		String par = "";
+		for (int i = 0; i < voferid.size(); i++)
+			par += " " + voferid.get(i).toString();
+		String cmd = "php " + php_path + "load_cc.php " + par;
+		System.out.print(par);
+		RunTime rt = new RunTime(cmd);
+		// if (rt.chek() > 0)
+		System.out.println(rt.err());
+		// else
+		System.out.println(rt.out());
+		Thread.sleep(100);
+	}
+
+	public static void main(String[] args)
+	{
+		try
+		{
+			new LoadMeneger();
+		} catch (IOException | InterruptedException | SQLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}

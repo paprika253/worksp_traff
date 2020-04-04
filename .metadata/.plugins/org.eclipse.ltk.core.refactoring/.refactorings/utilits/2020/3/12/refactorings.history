@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move element &apos;HttpClient.java&apos; to &apos;traffco/src/admin_panel&apos;&#x0A;- Original project: &apos;utilits&apos;&#x0A;- Destination element: &apos;traffco/src/admin_panel&apos;&#x0A;- Original element: &apos;utilits.httpclient.HttpClient.java&apos;&#x0A;- Update references to refactored element" description="Move compilation unit" destination="=traffco/src&lt;admin_panel" element1="/src&lt;utilits.httpclient{HttpClient.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" patterns="*" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1584602648454" units="1" version="1.0"/>
+</session>

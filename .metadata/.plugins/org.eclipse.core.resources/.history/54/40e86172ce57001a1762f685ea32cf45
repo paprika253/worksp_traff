@@ -1,0 +1,100 @@
+package server;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+import javax.imageio.ImageIO;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+public class Download_Images
+{
+	private String	img_path;
+	private int		offer_id;
+	private int		cretiv_id;
+	private String html_link;
+
+	
+
+	public Download_Images(String img_path, String html_link, String url_img, int offer_id, int cretiv_id)
+	{
+		this.img_path = img_path;
+		this.html_link=html_link;
+		this.offer_id = offer_id;
+		this.cretiv_id = cretiv_id;
+		Document doc = Jsoup.parse(html_link);
+		Element img_html = doc.select("img").first();
+		System.out.println("img_html = " + img_html);
+		String src = img_html.attr("src");
+		System.out.println("src = " + src);
+	}
+
+	private String save( int offer_id, int creative_id) throws MalformedURLException, IOException
+	{
+		return null;/*
+		img_src = img_src.replace("http:", "https:");
+		String sufix = "jpg";
+		String img_type = getImgType(img_src);
+		switch (img_type)
+		{
+		case "image/gif":
+			sufix = "gif";
+			break;
+		case "image/png":
+			sufix = "png";
+			break;
+		case "image/jpg":
+			sufix = "jpg";
+			break;
+		default:
+			return null;
+		}
+		String fileName = path + "creativ_img/" + offer_id + "_" + creative_id + "." + sufix;
+		File file = new File(fileName);
+		if (!file.exists())
+		{
+			BufferedImage img = ImageIO.read(new URL(img_src));
+			file.createNewFile();
+			ImageIO.write(img, "jpg", file);
+		}
+		return fileName;*/
+	}
+
+	private String getImgType(String fileName) throws IOException
+	{
+		String type = null;
+		URL u = new URL(fileName);
+		URLConnection uc = null;
+		uc = u.openConnection();
+		type = uc.getContentType();
+		return type;
+	}
+
+	public static void main(String[] args)
+	{
+		String url_img = "http://creative.traff.co/creativ_img/";
+		String img_path = "/var/www/html/creativ_img/";
+		String html_link = "<a href=\"http://www.mb01.com/lnk.asp?o=1740&c=107041&a=316122\">\n"
+				+ "<IMG SRC=\"http://www.mb01.com/getimage.asp?m=1569&o=1740&i=107041.dat\" width=468 height=60 border=0>\n"
+				+ "</a>";
+		int offer_id = 1740;
+		int cretiv_id = 107041;
+		Download_Images di = new Download_Images(img_path,  html_link ,url_img,offer_id, cretiv_id);
+		try
+		{
+			//System.out.println(html_link);
+			html_link = di.save( 17687, 145042);
+			//System.out.println(html_link);
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}

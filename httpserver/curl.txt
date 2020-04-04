@@ -1,0 +1,5 @@
+curl -X POST http://127.0.0.1:9999 -d ‘{«id»: «123″}’ -H «Content-Type:application/json»
+curl -X POST http://127.0.0.1:8080 -d ‘{«id»: «123″}’ -H «Content-Type:application/json»
+curl -d "key1=value1&key2=value2" "POST http://127.0.0.1:9999"
+curl "http://127.0.0.1:9999?key1=value1&key2=value2"
+curl -d '{"key1":"value1", "key2":"value2"}' -H "Content-Type: application/json" -X POST  http://127.0.0.1:8080/func1

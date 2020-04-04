@@ -1,0 +1,79 @@
+package admin_panel;
+
+
+import java.awt.GridBagConstraints;
+
+import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+
+
+public class CapStat extends IspectorTab
+{
+	public CapStat(JTabbedPane tp, MainPanel inspector)
+	{
+		super(tp, inspector);
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -526246469398303197L;
+
+	@Override
+	public String getTitle()
+	{
+		return "Capturing Packets#Захват пакетов";
+	}
+
+	@Override
+	public String[] getHeader()
+	{
+		return new String[]
+		{ "Type#Тип", "Amount#Количество" };
+	}
+
+	@Override
+	public String getAction()
+	{
+		return "pack_stat";
+	}
+
+	@Override
+	public void addSend(JSONObject send)
+	{
+		// send.put("aaa", 123);
+	}
+
+	@Override
+	public void redr(JSONObject jo, GridBagConstraints c)
+	{
+		JSONArray prots = (JSONArray) jo.get("prots");
+		int summa = 0;
+		for (int i = 0; i < prots.size(); i++)
+		{
+			JSONObject prot = (JSONObject) prots.get(i);
+			add(new JLabel(prot.get("proto").toString()), c);
+			c.gridx++;
+			int count = Integer.parseInt(prot.get("count").toString());
+			add(new JLabel(count + ""), c);
+			summa += count;
+			c.gridx = 0;
+			c.gridy++;
+		}
+		add(new JLabel("<html><br><b>" + "TOTAL:#ИТОГО:"), c);
+		c.gridx++;
+		add(new JLabel("<html><br><b>" + summa), c);
+	}
+
+	@Override
+	public void toolBarRedr(JToolBar tb)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+}

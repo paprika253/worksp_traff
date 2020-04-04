@@ -1,0 +1,85 @@
+package server;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import javax.imageio.ImageIO;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+/**
+ * @author yaa сохранение баннеров и изменение ссылок
+ */
+public class SaveImg
+{
+	static String save(int offer_id, int creative_id, String html_link, String img_path, String url_img)
+	{
+		/*
+		 * разбор парсером старой html ссылки и создание новой
+		 */
+		Document doc = Jsoup.parse(html_link);
+		Element img_html = doc.select("img").first();
+		String src = img_html.attr("src");
+		if (src.indexOf(url_img) > -1)
+			return "continue";
+		src = src.replace("http:", "https:");
+		String type = null;
+		try
+		{
+			type = getImgType(src);
+		} catch (IOException e)
+		{
+			type = null;
+			return null;
+		}
+		if (type == null)
+			return null;
+		String url_img_full = url_img + offer_id + "_" + creative_id + "." + type;
+		img_html.attr("src", url_img_full);
+		Element a_html = doc.select("a").first();
+		/*
+		 * закачка баннера и сохранение на нашем сервере
+		 */
+		String fileName = img_path + offer_id + "_" + creative_id + "." + type;
+		File file = new File(fileName);
+		if (!file.exists())
+		{
+			BufferedImage img;
+			try
+			{
+				img = ImageIO.read(new URL(src));
+				file.createNewFile();
+				ImageIO.write(img, type, file);
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+				return null;
+			}
+		}
+		return a_html.toString();
+	}
+
+	/**
+	 * определяет тип файла
+	 * 
+	 * @param src
+	 *            ссылка на изображение
+	 * @return тип файла
+	 * @throws IOException
+	 */
+	private static String getImgType(String src) throws IOException
+	{
+		String type = null;
+		URL u = new URL(src);
+		URLConnection uc = null;
+		uc = u.openConnection();
+		type = uc.getContentType();
+		String[] tmp = type.split("/");
+		if (tmp.length == 2)
+			return tmp[1];
+		return null;
+	}
+}

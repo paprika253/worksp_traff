@@ -1,0 +1,52 @@
+{
+"id": "ACjxcF5xkAAAAAAAAFVTFwASAA5X-ZwA",
+"imp": [
+{
+"id": "ACjxcF5xkAAAtiwCAFVTFwASAK4p-i8A",
+"banner": {
+"w": 125,
+"h": 125
+},
+"bidfloor": 0.01,
+"bidfloorcur": "USD",
+"secure": 0
+}
+],
+"site": {
+"id": "36977",
+"name": "sex-vip.com",
+"domain": "sex-vip.com",
+"cat": [
+"IAB22-1",
+"IAB24"
+],
+"publisher": {
+"id": "60129"
+},
+"keywords": "SEX VIP - FREE PORN VIDEOS",
+"page": "http://www.sex-vip.com/",
+"search": "SEX VIP - FREE PORN VIDEOS"
+},
+"device": {
+"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.10 Safari/537.36 Edg/77.0.235.4",
+"geo": {
+"lat": 32.6085,
+"lon": -96.8655,
+"type": 2,
+"ipservice": 3,
+"country": "USA"
+},
+"ip": "76.185.51.210",
+"os": "Windows",
+"language": "en",
+"carrier": "Spectrum"
+},
+"user": {
+"id": "3780e681991e8de958c483cc44f4eb29e048eb7f"
+},
+"at": 2,
+"tmax": 821,
+"cur": [
+"USD"
+]
+}

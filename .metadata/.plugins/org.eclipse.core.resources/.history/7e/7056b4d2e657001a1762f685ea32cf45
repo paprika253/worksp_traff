@@ -1,0 +1,94 @@
+package server;
+
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Vector;
+
+import utilites.DbMySql;
+import utilites.Set;
+
+public class LoadMeneger
+{
+	private DbMySql	db;
+	private String	php_path;
+
+	public LoadMeneger() throws IOException, InterruptedException, SQLException
+	{
+		db = new DbMySql("traff", "localhost", "yaa", "a20071952");
+		Set set = new Set(db.conn);
+		Log log = new Log(db.conn);
+		log.put(1, "Download API Information from Maxbounty - started");
+		php_path = set.get("php_path");
+		RunTime rt = new RunTime("php " + php_path + "load_cl.php");
+		//if (rt.chek() > 0)
+			System.out.println(rt.err());
+		//else
+			System.out.println(rt.out());
+		log.put(1, "Download Compaign Creatives - started");
+		// очистка таблиц
+		PreparedStatement ps = db.conn.prepareStatement("TRUNCATE TABLE compaign_creatives");
+		ps.execute();
+		ps = db.conn.prepareStatement("TRUNCATE TABLE err_offerid");
+		ps.execute();
+		//
+		System.out.println("OFFER_ID:");
+		Vector<String> voferid = new Vector<String>();
+		int i = 0;
+		ps = db.conn.prepareStatement("SELECT OFFER_ID FROM campaign_list");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next())
+		{
+			voferid.add(rs.getInt("OFFER_ID") + "");
+			if (i > 19)
+			{
+				start_php_cc(voferid);
+				voferid.clear();
+				i = 0;
+			}
+			i++;
+		}
+		start_php_cc(voferid);
+		log.put(1, "End of creative upload.");
+		ps = db.conn.prepareStatement("SELECT OFFER_ID FROM err_offerid");
+		rs = ps.executeQuery();
+		i = 0;
+		while (rs.next())
+		{
+			PreparedStatement ps1 = db.conn.prepareStatement("DELETE FROM campaign_list WHERE OFFER_ID = ?");
+			ps1.setInt(1, rs.getInt("OFFER_ID"));
+			ps1.execute();
+			i++;
+		}
+		log.put(1, i + " ad campaigns removed due to lack of creatives.");
+		// перекачка изображений
+	}
+
+	private void start_php_cc(Vector<String> voferid) throws IOException, InterruptedException
+	{
+		String par = "";
+		for (int i = 0; i < voferid.size(); i++)
+			par += " " + voferid.get(i).toString();
+		String cmd = "php " + php_path + "load_cc.php " + par;
+		System.out.print(par);
+		RunTime rt = new RunTime(cmd);
+		//if (rt.chek() > 0)
+			System.out.println(rt.err());
+		//else
+			System.out.println(rt.out());
+		Thread.sleep(100);
+	}
+
+	public static void main(String[] args)
+	{
+		try
+		{
+			new LoadMeneger();
+		} catch (IOException | InterruptedException | SQLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}

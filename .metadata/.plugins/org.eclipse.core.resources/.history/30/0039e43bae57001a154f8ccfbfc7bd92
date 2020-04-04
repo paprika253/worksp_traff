@@ -1,0 +1,21 @@
+package server;
+
+import java.net.*;
+
+public class FileUtils{
+  public static String getMimeType(String fileUrl)
+    throws java.io.IOException, MalformedURLException
+  {
+    String type = null;
+    URL u = new URL(fileUrl);
+    URLConnection uc = null;
+    uc = u.openConnection();
+    type = uc.getContentType();
+    return type;
+  }
+
+  public static void main(String args[]) throws Exception {
+    System.out.println(FileUtils.getMimeType("file://c:/temp/test.TXT"));
+    // output :  text/plain
+  }
+}

@@ -1,0 +1,28 @@
+package server;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+public class SaveImg
+{
+	public static void main(String[] args)
+	{
+		String html_link = "<a href=\"http://www.mb01.com/lnk.asp?o=1740&c=107041&a=316122\">\n"
+				+ "<IMG SRC=\"http://www.mb01.com/getimage.asp?m=1569&o=1740&i=107041.dat\" width=468 height=60 border=0>\n"
+				+ "</a>";
+		String img_path = "/var/www/html/creativ_img/";
+		String new_html_link = SaveImg.save(17687, 145042, html_link, img_path);
+		System.out.println("new_html_link = "+new_html_link );
+	}
+
+	private static String save(int offer_id, int cretiv_id, String html_link, String img_path)
+	{
+		Document doc = Jsoup.parse(html_link);
+		Element img_html = doc.select("img").first();
+		System.out.println("img_html = " + img_html);
+		String src = img_html.attr("src");
+		System.out.println("src = " + src);
+		return null;
+	}
+}

@@ -1,0 +1,49 @@
+package admin_panel;
+
+import java.awt.GridBagConstraints;
+
+import javax.swing.JToolBar;
+
+import org.json.simple.JSONObject;
+
+public class Work_log extends IspectorTab
+{
+	@Override
+	public void redr(JSONObject jo, GridBagConstraints c)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public String getTitle()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] getHeader()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getAction()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addSend(JSONObject send)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void toolBarRedr(JToolBar tb)
+	{
+		// TODO Auto-generated method stub
+	}
+}

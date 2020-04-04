@@ -1,0 +1,163 @@
+package admin_panel;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import org.apache.http.message.BasicNameValuePair;
+
+import utilites.Config;
+
+public class MainPanel extends JFrame
+{
+	/**
+	 * 
+	 */
+	private static final long	serialVersionUID	= -7134209143503104609L;
+	private static final int	DEFAULT_HEIGHT		= 600;
+	private static final int	DEFAULT_WIDTH		= 1024;
+	private JPanel				cp;
+	String						server_url;
+	private String				urlWSDL;
+	private Config				cnf;
+	private String				userWSDL;
+	private String				passwordWSDL;
+	private Vector<Job>			tabJob;
+
+	public MainPanel(String title) throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+			UnsupportedLookAndFeelException, IOException
+	{
+		super(title);
+		// config
+		cnf = new Config("config.ini");
+		server_url = cnf.get("url_server");
+		//
+		List<BasicNameValuePair> pairs = new ArrayList<BasicNameValuePair>();
+		pairs.add(new BasicNameValuePair("action", "import_campaign_list"));
+		pairs.add(new BasicNameValuePair("server_url", server_url));
+		pairs.add(new BasicNameValuePair("url", urlWSDL));
+		pairs.add(new BasicNameValuePair("user", userWSDL));
+		pairs.add(new BasicNameValuePair("password", passwordWSDL));
+		//
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		// setExtendedState ( JFrame.MAXIMIZED_BOTH );
+		Toolkit kit = Toolkit.getDefaultToolkit();
+		Dimension screenSize = kit.getScreenSize();
+		setLocation((screenSize.width - DEFAULT_WIDTH) / 2, (screenSize.height - DEFAULT_HEIGHT) / 2);
+		Image image = Toolkit.getDefaultToolkit().createImage(MainPanel.class.getResource("images/traff.png"));
+		setIconImage(image);
+		Container contentPane = getContentPane();
+		contentPane.setLayout(new BorderLayout());
+		// Toolbar
+		JToolBar tb = new JToolBar("Still draggable");
+		tb.setRollover(true);
+		JButton icl_batton = new JButton(new ImageIcon(MainPanel.class.getResource("images/smoke.png")));
+		icl_batton.setToolTipText("Loading creatives");
+		icl_batton.addActionListener(new ImportCampaignList(this, pairs));
+		tb.add(icl_batton);
+		JButton exit_batton = new JButton(new ImageIcon(MainPanel.class.getResource("images/exit.png")));
+		exit_batton.setToolTipText("Exit");
+		exit_batton.setToolTipText("Exit");
+		exit_batton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				System.exit(NORMAL);
+			}
+		});
+		tb.add(exit_batton);
+		contentPane.add(tb, BorderLayout.NORTH);
+		// Center panel
+		tabJob = new Vector<Job>();
+		JTabbedPane tp = new JTabbedPane();
+		addPanel(new CapStat(tp, this), 1000, 10);
+		addPanel(new Work_log(tp, this), 1000, 10);
+		contentPane.add(tp, BorderLayout.CENTER);
+		// grafica
+		DGraph dg = new DGraph(this, 2);
+		dg.setColor(0, Color.blue, "show");
+		dg.setColor(1, Color.red, "click");
+		new Thread(dg).start();
+		// south panel
+		JPanel s_panel = new JPanel();
+		s_panel.setLayout(new BorderLayout());
+		s_panel.add((Component) dg, BorderLayout.NORTH);
+		s_panel.add(getCopyright(), BorderLayout.SOUTH);
+		contentPane.add(s_panel, BorderLayout.SOUTH);
+		// Menu
+		JMenuBar menuBar = new JMenuBar();
+		JMenu menu_file = new JMenu("File");
+		JMenuItem m_exit = new JMenuItem("Exit");
+		menu_file.add(m_exit);
+		m_exit.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				System.exit(NORMAL);
+			}
+		});
+		menuBar.add(menu_file);
+		JMenu menu_import = new JMenu("Import");
+		JMenuItem m_import_campaignList = new JMenuItem("Loading creatives");
+		// m_import_campaignList.addActionListener(new ImportCampaignList(this,
+		// pairs));
+		m_import_campaignList.addActionListener(new ImportCampaignList(this, pairs));
+		menu_import.add(m_import_campaignList);
+		menuBar.add(menu_import);
+		setJMenuBar(menuBar);
+		setVisible(true);
+	}
+
+	public static JLabel getCopyright()
+	{
+		return new JLabel(
+				"<html><br> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; Copyright © 2020. Limited Liability "
+						+ "Company <strong>\"Traff.co\"</strong>. All rights reserved.<br> &nbsp;");
+	}
+
+	private void addPanel(IspectorTab job, int time, int skip)
+	{
+		tabJob.addElement(new Job(job, time, skip));
+	}
+
+	public static void main(String[] args)
+	{
+		try
+		{
+			new MainPanel("TraffCo Server Control Panel");
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException | IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}

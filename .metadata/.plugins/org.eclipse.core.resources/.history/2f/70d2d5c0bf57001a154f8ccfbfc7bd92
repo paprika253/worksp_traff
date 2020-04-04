@@ -1,0 +1,27 @@
+package server;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+public class parser
+{
+	public static void main(String[] args)
+	{
+		Document doc = Jsoup.parse("<a href=\"http://www.mb01.com/lnk.asp?o=1740&c=107044&a=316122\">\n"
+				+ "<IMG SRC=\"http://www.mb01.com/getimage.asp?m=1569&o=1740&i=107044.dat\" width=728 height=90 border=0>\n"
+				+ "</a>");
+		Element img = doc.select("img").first();
+		String src = img.attr("src");
+		
+		System.out.println("img = " + img);
+		System.out.println("src = " + src);
+		img.attr("src","http://www.traff.co");
+		System.out.println("img = " + img);
+		//img.
+		//linkInnerH=linkInnerH.replace("mb01.com", "traff.co");
+		//link.text(linkInnerH);
+		//System.out.println("linkInnerH = " + linkInnerH);
+		
+	}
+}
